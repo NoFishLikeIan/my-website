@@ -28,10 +28,13 @@
   "dependencies": {
     "@accurat/tachyons-lite": "^1.0.4",
     "d3": "^5.7.0",
+    "d3-scale": "^2.1.2",
+    "konva": "^2.6.0",
     "lodash": "^4.17.11",
     "modern-normalize": "^0.5.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
+    "react-konva": "^16.7.1",
     "tachyons-extra": "^1.1.2"
   }
 }

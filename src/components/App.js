@@ -1,13 +1,15 @@
 import React from 'react'
+import { BoidsChase } from './BoidsChase'
 
 export default class App extends React.Component {
   render() {
     return (
       <div>
-        <h2>React App</h2>
-        <p>
-          To get started, edit <code>components/App.js</code> and save to reload.
-        </p>
+        <div className="section">This is a me</div>
+        <div className="section">
+          <BoidsChase />
+        </div>
+        <div className="section">Viz</div>
       </div>
     )
   }

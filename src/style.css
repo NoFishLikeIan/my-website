@@ -46,3 +46,33 @@ iframe {
   border-width: 1px;
   border-color: gray;
 }
+
+.select {
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-color: darkgray;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 500;
+  width: 15rem;
+}
+
+.corpus {
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 300;
+  margin-top: 12px;
+}
+
+.selectAViz {
+  font-family: 'Roboto Mono', monospace;
+  width: 40vw;
+  height: 40vw;
+}
+
+.options {
+  padding: 0.5rem;
+  width: 15rem;
+}
+.options:hover {
+  cursor: pointer;
+  background-color: gray;
+}

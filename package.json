@@ -26,6 +26,7 @@
     "webpack-preset-accurapp": "^4.1.8"
   },
   "dependencies": {
+    "@accurat/react-components": "^0.3.3",
     "@accurat/tachyons-lite": "^1.0.4",
     "d3": "^5.7.0",
     "d3-scale": "^2.1.2",

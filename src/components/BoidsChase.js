@@ -1,14 +1,25 @@
 import React from 'react'
 import { scaleLinear } from 'd3-scale'
-import { range, mean } from 'lodash'
+import { range, max, mean, sortBy, clamp } from 'lodash'
 import { Circle, Stage, Layer } from 'react-konva'
 
 import { calculateMagnitude, vectorSubtract } from '../lib/boidsUtils'
 
 const WINDOW_F = 0.4
 const RADIUS = 5
-const MAX_SPEED = 0.001
-const MAX_FORCE = 0.01
+const MAX_SPEED = 1e-1
+const MAX_FORCE = 0.0005
+const ARREST_DISTANCE = 0.05
+const IM_WALL = 5
+
+const pctOfSpped = (l = 0.1, u = 0.5) => Math.random() * (u - l + 1) + l
+const indexOfMaxValue = a => a.reduce((iMax, x, i, arr) => (x > arr[iMax] ? i : iMax), 0)
+
+function distanceBetweenTwoAngles(alpha, beta) {
+  const phi = Math.abs(beta - alpha) % (Math.PI * 2)
+  const distance = phi > Math.PI ? Math.PI - phi : phi
+  return distance
+}
 
 export class PVector {
   constructor(x, y) {
@@ -35,23 +46,9 @@ export class PVector {
     this.y -= target.y
   }
 
-  innerAdd(target, xLim = [], yLim = []) {
-    if (xLim.length && yLim) {
-      const expectedX = target.x + this.x
-      const expectedY = target.y + this.y
-
-      this.x =
-        expectedX > xLim[1]
-          ? expectedX % xLim[1]
-          : (xLim[1] / expectedX) * expectedX + (xLim[1] % expectedX)
-      this.y =
-        expectedY > yLim[1]
-          ? expectedY % yLim[1]
-          : (yLim[1] / expectedY) * expectedY + (yLim[1] % expectedY)
-    } else {
-      this.x += target.x
-      this.y += target.y
-    }
+  innerAdd(target) {
+    this.x += target.x
+    this.y += target.y
   }
 
   limit(maxLimit) {
@@ -62,6 +59,12 @@ export class PVector {
   }
 }
 
+function randomPointFromAngle(angle) {
+  const x = clamp(Math.cos(angle) * Math.random() * 100, 10, 90)
+  const y = clamp(Math.sin(angle) * Math.random() * 100, 10, 90)
+  return new PVector(x, y)
+}
+
 class Vehicle {
   constructor(velocity, location, acceleration, maxSpeed, maxForce) {
     this.velocity = new PVector(...velocity)
@@ -69,10 +72,25 @@ class Vehicle {
     this.acceleration = new PVector(...acceleration)
     this.maxSpeed = maxSpeed
     this.maxForce = maxForce
+
+    this.initTarget = new PVector(Math.random() * 100, Math.random() * 100)
   }
 
   update() {
     this.location.innerAdd(this.velocity)
+
+    if (this.location.x < 0) {
+      this.location.x = 100 + this.location.x
+    } else if (this.location.x > 100) {
+      this.location.x = this.location.x - 100
+    }
+
+    if (this.location.y < 0) {
+      this.location.y = 100 + this.location.y
+    } else if (this.location.y > 100) {
+      this.location.y = this.location.y - 100
+    }
+
     this.velocity.innerAdd(this.acceleration)
     this.acceleration.multiply(0)
   }
@@ -81,23 +99,103 @@ class Vehicle {
     this.acceleration.innerAdd(force)
   }
 
-  seek(target) {
-    const desired = vectorSubtract(target, this.location)
+  runFrom(target) {
+    let desired = vectorSubtract(this.location, target)
+
+    const d = calculateMagnitude(desired)
     desired.normalize()
-    desired.multiply(this.maxSpeed)
+
+    if (d < ARREST_DISTANCE) {
+      const m = d * this.maxSpeed
+      desired.multiply(m)
+    } else {
+      desired.multiply(this.maxSpeed)
+    }
+
     const steer = vectorSubtract(desired, this.velocity)
     steer.limit(this.maxForce)
-
     this.applyForce(steer)
   }
 
-  runFrom(target) {
-    const desired = vectorSubtract(this.location, target)
+  seek(target) {
+    let desired = vectorSubtract(target, this.location)
+
+    const d = calculateMagnitude(desired)
     desired.normalize()
-    desired.multiply(this.maxSpeed)
+
+    if (d < ARREST_DISTANCE) {
+      const m = d * this.maxSpeed
+      desired.multiply(m)
+    } else {
+      desired.multiply(this.maxSpeed)
+    }
     const steer = vectorSubtract(desired, this.velocity)
     steer.limit(this.maxForce)
+    this.applyForce(steer)
+  }
 
+  boundaries() {
+    let desired
+    if (this.location.x < IM_WALL) {
+      desired = new PVector(this.maxSpeed, this.velocity.y)
+    } else if (this.location.x > 100 - IM_WALL) {
+      desired = new PVector(-this.maxspeed, this.velocity.y)
+    }
+    if (this.location.y < IM_WALL) {
+      desired = new PVector(this.velocity.x, this.maxSpeed)
+    } else if (this.location.y > 100 - IM_WALL) {
+      desired = new PVector(this.velocity.x, -this.maxSpeed)
+    }
+
+    if (desired != null) {
+      desired.normalize()
+      desired.multiply(this.maxSpeed)
+      const steer = vectorSubtract(desired, this.velocity)
+      steer.limit(this.maxForce)
+      this.applyForce(steer)
+    }
+  }
+
+  randomSeek(seekers) {
+    const closeEnough =
+      Math.sqrt(
+        Math.pow(this.location.x - this.initTarget.x, 2),
+        Math.pow(this.location.y - this.initTarget.y, 2),
+      ) < 2
+
+    if (closeEnough) {
+      const angles = sortBy(angleBetween(seekers, this))
+
+      const deltaAngles = angles.map((_, i, ang) => {
+        const dist =
+          i === 0
+            ? distanceBetweenTwoAngles(ang[i], ang[ang.length]) || 0
+            : distanceBetweenTwoAngles(ang[i], ang[i - 1])
+        return dist
+      })
+
+      const maxIndex = indexOfMaxValue(deltaAngles)
+
+      const widerAngle =
+        maxIndex !== 0
+          ? mean([angles[maxIndex - 1], angles[maxIndex]])
+          : mean([Math.PI - angles[angles.length], angles[maxIndex]])
+
+      const target = randomPointFromAngle(widerAngle)
+
+      this.initTarget = target
+      this.seek(this.initTarget)
+    } else {
+      this.seek(this.initTarget)
+    }
+  }
+
+  randomMovement() {
+    const desired = new PVector(Math.random() * 100, Math.random() * 100)
+    desired.multiply(this.maxSpeed)
+
+    const steer = vectorSubtract(desired, this.velocity)
+    steer.limit(this.maxForce)
     this.applyForce(steer)
   }
 }
@@ -108,18 +206,45 @@ export class BoidsChase extends React.Component {
     width: window.innerWidth * WINDOW_F,
     runner: null,
     seekers: [],
-    mousePosition: [0.5, 0.5],
+    mousePosition: [50, 50],
+    interval: 0,
   }
 
+  interval = 0
   stage = React.createRef()
 
   recomputeWindow = () => this.setState({ width: window.innerWidth * WINDOW_F })
 
+  randomSeeker = () => {
+    return new Vehicle(
+      [0, 0],
+      [Math.random() * 100, Math.random() * 100],
+      [0, 0],
+      MAX_SPEED * pctOfSpped(),
+      MAX_FORCE * pctOfSpped(),
+    )
+  }
+
+  appendRandomSeeker = () => {
+    const { seekers } = this.state
+    const newSeeker = this.randomSeeker()
+    const newSeekers = seekers.slice()
+    newSeekers.push(newSeeker)
+    this.setState({ seekers: newSeekers })
+  }
+
   componentDidMount() {
     window.addEventListener('resize', this.recomputeWindow)
-    const runner = new Vehicle([0, 0], [0.5, 0.5], [0, 0], MAX_SPEED, MAX_FORCE)
-    const seekers = range(3).map(
-      _ => new Vehicle([0, 0], [Math.random(), Math.random()], [0, 0], MAX_SPEED, MAX_FORCE),
+    const runner = new Vehicle([0, 0], [50, 50], [0, 0], MAX_SPEED, MAX_FORCE)
+    const seekers = range(10).map(
+      _ =>
+        new Vehicle(
+          [0, 0],
+          [Math.random() * 100, Math.random() * 100],
+          [0, 0],
+          MAX_SPEED * pctOfSpped(),
+          MAX_FORCE * pctOfSpped(),
+        ),
     )
 
     this.setState({ runner, seekers })
@@ -129,58 +254,72 @@ export class BoidsChase extends React.Component {
 
   updateFrame = () => {
     const { runner, seekers, frame } = this.state
-    seekers.map(s => {
+    seekers.forEach(s => {
       s.seek(runner.location)
+      s.boundaries()
       s.update()
     })
 
-    const xS = seekers.map(s => s.location.x)
-    const yS = seekers.map(s => s.location.y)
-
-    const meanX = mean(xS)
-    const meanY = mean(yS)
-    runner.runFrom(new PVector(meanX, meanY))
+    runner.randomSeek(seekers)
     runner.update()
-    setInterval(this.updateFrame, 60)
+    this.interval = setInterval(this.updateFrame, 16)
     this.setState({ frame: frame + 1 })
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.recomputeWindow)
     this.updateFrame()
+    clearInterval(this.interval)
   }
 
   render() {
     const { width: side, runner, seekers } = this.state
     const scale = scaleLinear()
-      .domain([0, 1])
+      .domain([0, 100])
       .range([0, side])
 
     return (
       runner &&
       seekers.length && (
-        <Stage width={side} height={side} className="ma4 ba b--gray" ref={this.stage}>
+        <Stage width={side} height={side} ref={this.stage} onClick={this.appendRandomSeeker}>
           <Layer>
             <Circle
-              x={scale(runner.location.x)}
-              y={scale(runner.location.y)}
+              x={scale(runner.location.x) || 0}
+              y={scale(runner.location.y) || 0}
               radius={RADIUS}
               fill={'red'}
               opacity={0.8}
             />
-            {seekers.map((s, i) => (
-              <Circle
-                key={i}
-                x={scale(s.location.x)}
-                y={scale(s.location.y)}
-                radius={RADIUS}
-                fill={'blue'}
-                opacity={0.8}
-              />
-            ))}
+            {seekers.map((s, i) => {
+              const x = scale(s.location.x)
+              const y = scale(s.location.y)
+              if (x && y) {
+                return (
+                  <Circle
+                    key={i}
+                    x={x}
+                    y={y}
+                    radius={RADIUS}
+                    fill={'blue'}
+                    opacity={x && y ? 0.8 : 0}
+                  />
+                )
+              }
+            })}
           </Layer>
         </Stage>
       )
     )
   }
+}
+
+function angleBetween(seekers, target) {
+  return seekers
+    .map(s => {
+      const deltaX = s.location.x - target.location.x
+      const deltaY = s.location.y - target.location.y
+      const angle = Math.atan2(deltaY, deltaX)
+      return angle < 0 ? Math.PI * 2 + angle : angle
+    })
+    .filter(angles => !Number.isNaN(angles))
 }

@@ -7,12 +7,12 @@ import { calculateMagnitude, vectorSubtract } from '../lib/boidsUtils'
 
 const WINDOW_F = 0.4
 const RADIUS = 5
-const MAX_SPEED = 1e-1
-const MAX_FORCE = 0.0005
+const MAX_FORCE = 2
+const MAX_SPEED = 1
 const ARREST_DISTANCE = 0.05
 const IM_WALL = 5
 
-const pctOfSpped = (l = 0.1, u = 0.5) => Math.random() * (u - l + 1) + l
+const pctOfSpped = (l = 0.1, u = 0.2) => Math.random() * (u - l + 1) + l
 const indexOfMaxValue = a => a.reduce((iMax, x, i, arr) => (x > arr[iMax] ? i : iMax), 0)
 
 function distanceBetweenTwoAngles(alpha, beta) {
@@ -65,7 +65,7 @@ function randomPointFromAngle(angle) {
   return new PVector(x, y)
 }
 
-class Vehicle {
+export class Vehicle {
   constructor(velocity, location, acceleration, maxSpeed, maxForce) {
     this.velocity = new PVector(...velocity)
     this.location = new PVector(...location)
@@ -129,8 +129,10 @@ class Vehicle {
     } else {
       desired.multiply(this.maxSpeed)
     }
+
     const steer = vectorSubtract(desired, this.velocity)
     steer.limit(this.maxForce)
+
     this.applyForce(steer)
   }
 
@@ -181,7 +183,9 @@ class Vehicle {
           ? mean([angles[maxIndex - 1], angles[maxIndex]])
           : mean([Math.PI - angles[angles.length], angles[maxIndex]])
 
-      const target = randomPointFromAngle(widerAngle)
+      const noise = ((Math.random() * 2 - 1) * Math.PI) / 24
+      const noiseyWiderAngle = widerAngle + noise
+      const target = randomPointFromAngle(noiseyWiderAngle)
 
       this.initTarget = target
       this.seek(this.initTarget)
@@ -220,8 +224,8 @@ export class BoidsChase extends React.Component {
       [0, 0],
       [Math.random() * 100, Math.random() * 100],
       [0, 0],
-      MAX_SPEED * pctOfSpped(),
-      MAX_FORCE * pctOfSpped(),
+      MAX_SPEED * pctOfSpped(0.05, 0.1),
+      MAX_FORCE * pctOfSpped(0.05, 0.1),
     )
   }
 
@@ -242,13 +246,13 @@ export class BoidsChase extends React.Component {
           [0, 0],
           [Math.random() * 100, Math.random() * 100],
           [0, 0],
-          MAX_SPEED * pctOfSpped(),
-          MAX_FORCE * pctOfSpped(),
+          MAX_SPEED * pctOfSpped(0.05, 0.06),
+          MAX_FORCE * pctOfSpped(0.05, 0.06),
         ),
     )
 
     this.setState({ runner, seekers })
-    const frame = setInterval(this.updateFrame, 150)
+    const frame = setInterval(this.updateFrame, 15)
     this.setState({ runner, seekers, frame })
   }
 
@@ -256,13 +260,11 @@ export class BoidsChase extends React.Component {
     const { runner, seekers, frame } = this.state
     seekers.forEach(s => {
       s.seek(runner.location)
-      s.boundaries()
       s.update()
     })
 
     runner.randomSeek(seekers)
     runner.update()
-    this.interval = setInterval(this.updateFrame, 16)
     this.setState({ frame: frame + 1 })
   }
 

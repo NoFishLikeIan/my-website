@@ -73,6 +73,8 @@ export class MiceWithBoids extends React.Component {
       .domain([0, 100])
       .range([RADIUS, side - RADIUS])
 
+    const totalNumberOfSeekers = seekers.length
+    const baseOpacity = 0.8 / totalNumberOfSeekers
     return (
       seekers.length !== 0 && (
         <Stage width={side} height={side} ref={this.stage} onClick={this.appendRandomSeeker}>
@@ -80,6 +82,7 @@ export class MiceWithBoids extends React.Component {
             {seekers.map((s, i) => {
               const x = scale(s.location.x)
               const y = scale(s.location.y)
+              const opacity = 0.2 + baseOpacity * i
               if (x && y) {
                 return (
                   <Circle
@@ -88,7 +91,7 @@ export class MiceWithBoids extends React.Component {
                     y={y}
                     radius={RADIUS}
                     fill={'blue'}
-                    opacity={x && y ? 0.8 : 0}
+                    opacity={x && y ? opacity : 0}
                   />
                 )
               }

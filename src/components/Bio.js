@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { GeneticPicture } from './GeneticPicture'
+
 export class Bio extends React.Component {
   render() {
     return (
@@ -46,6 +48,9 @@ export class Bio extends React.Component {
             Just as a disclaimer, this website will be desktop only and a constant work in progress
             because I cannot be bothered.
           </div>
+        </div>
+        <div className="w-50">
+          <GeneticPicture />
         </div>
       </div>
     )

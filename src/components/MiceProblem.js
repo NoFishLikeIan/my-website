@@ -1,7 +1,6 @@
 import React from 'react'
 import { scaleLinear } from 'd3-scale'
-import { line } from 'd3-shape'
-import { Circle, Stage, Layer, Path } from 'react-konva'
+import { Circle, Stage, Layer } from 'react-konva'
 
 const WINDOW_F = 0.4
 const RADIUS = 5

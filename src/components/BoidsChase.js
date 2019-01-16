@@ -1,6 +1,6 @@
 import React from 'react'
 import { scaleLinear } from 'd3-scale'
-import { range, max, mean, sortBy, clamp } from 'lodash'
+import { range, mean, sortBy, clamp } from 'lodash'
 import { Circle, Stage, Layer } from 'react-konva'
 
 import { calculateMagnitude, vectorSubtract } from '../lib/boidsUtils'

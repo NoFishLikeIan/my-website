@@ -1,9 +1,10 @@
 import React from 'react'
-import { Select, TextInput } from '@accurat/react-components'
+import { Select } from '@accurat/react-components'
 import { range } from 'lodash'
 import { MiceProblem } from './MiceProblem'
 import { BoidsChase } from './BoidsChase'
 import { MiceWithBoids } from './MiceWithBoids'
+import { Bio } from './Bio'
 
 const possibleSelections = ['Boids Chase', 'Mice Problem', 'Mice Boids', 'Deselected']
 
@@ -86,13 +87,13 @@ export default class App extends React.Component {
 
     return (
       <div>
-        <div className="section">This is a me</div>
+        <Bio />
         <div className="section">
           <div className="ba b-grey flex flex-row">
             <VizComponent
-              name={selectedViz} // key={selection}
+              name={selectedViz}
+              key={`${selection}_${numberOfMice}`}
               numberOfSeekers={numberOfMice || 4}
-              key={numberOfMice}
             />
             <div className="w-50 bl b--darkgray pa2">
               <Select className="bn select" label={selectedViz}>

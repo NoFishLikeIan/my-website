@@ -3,10 +3,11 @@
 import React from 'react'
 import getPixels from 'get-pixels'
 import { range, clamp, flatten, sum } from 'lodash'
-import { Circle, Stage, Layer, Image } from 'react-konva'
+import GPU from 'gpu.js'
+import { Circle, Stage, Layer } from 'react-konva'
 
 const STEP = 255 * 0.1
-const IMAGE = '/slack.png'
+const IMAGE = '/100x100.jpg'
 const MIN_RADIUS = 1
 const MAX_RADIUS = 5
 const random = () => Math.random() * 2 - 1
@@ -118,6 +119,8 @@ class GeneticAlgorithm {
     this.height = height
     this.getPixelFn = getPixelFn
     this.offSpring = range(n).map(idx => new Instance(width, height, getPixelFn, idx))
+
+    this.gpu = new GPU()
   }
 
   get allData() {

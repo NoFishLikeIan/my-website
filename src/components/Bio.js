@@ -5,7 +5,7 @@ import { GeneticPicture } from './GeneticPicture'
 export class Bio extends React.Component {
   render() {
     return (
-      <div className="section">
+      <div className="section flex flex-row">
         <div className="w-50 h-100 relative">
           <div className="mv2 mh2">
             A self-deprecating website for a guy interested in Mathematics, Economics and

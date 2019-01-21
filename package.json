@@ -33,6 +33,7 @@
     "d3-shape": "^1.2.2",
     "konva": "^2.6.0",
     "lodash": "^4.17.11",
+    "mathjax": "^2.7.5",
     "modern-normalize": "^0.5.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",

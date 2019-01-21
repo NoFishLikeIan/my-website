@@ -33,6 +33,15 @@ const Corpus = ({ name, miceFn, miceValue }) => {
           <a href="https://natureofcode.com/" target="_blank" rel="noopener noreferrer">
             Nature of Code
           </a>
+          <br />
+          <div className="mv4">
+            The blue boids get initialized with as a maximum acceleration a percentage of the
+            acceleration of the runner, i.e. the red boid and chaise him according to standard boids
+            rule (see the reference above). The runner tries to avoid the chasers by finding the
+            widest angle, from his point of view, formed by two chasers and seeking a point
+            somewhere towards that direction. <br />
+            Click on the visualization to spawn another chaser.
+          </div>
         </>
       ) : name === 'Mice Problem' ? (
         <>Hello mice</>
@@ -112,7 +121,7 @@ export default class App extends React.Component {
             </div>
           </div>
         </div>
-        <div className="section">Viz</div>
+        {/* <div className="section">Viz</div> */}
       </div>
     )
   }

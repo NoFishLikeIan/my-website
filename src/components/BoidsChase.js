@@ -3,6 +3,7 @@ import { scaleLinear } from 'd3-scale'
 import { range, mean, sortBy, clamp } from 'lodash'
 import { Circle, Stage, Layer } from 'react-konva'
 
+import { Ripple } from './Ripple'
 import { calculateMagnitude, vectorSubtract } from '../lib/boidsUtils'
 
 const WINDOW_F = 0.4
@@ -74,6 +75,8 @@ export class Vehicle {
     this.maxForce = maxForce
 
     this.initTarget = new PVector(Math.random() * 100, Math.random() * 100)
+
+    this.firstRender = false
   }
 
   update() {
@@ -283,7 +286,13 @@ export class BoidsChase extends React.Component {
     return (
       runner &&
       seekers.length && (
-        <Stage width={side} height={side} ref={this.stage} onClick={this.appendRandomSeeker}>
+        <Stage
+          width={side}
+          height={side}
+          ref={this.stage}
+          onClick={this.appendRandomSeeker}
+          className="pointer"
+        >
           <Layer>
             <Circle
               x={scale(runner.location.x) || 0}
@@ -297,14 +306,17 @@ export class BoidsChase extends React.Component {
               const y = scale(s.location.y)
               if (x && y) {
                 return (
-                  <Circle
-                    key={i}
-                    x={x}
-                    y={y}
-                    radius={RADIUS}
-                    fill={'blue'}
-                    opacity={x && y ? 0.8 : 0}
-                  />
+                  <>
+                    <Circle
+                      key={i}
+                      x={x}
+                      y={y}
+                      radius={RADIUS}
+                      fill={'blue'}
+                      opacity={x && y ? 0.8 : 0}
+                    />
+                    {s.firstRender && <Ripple x={x} y={y} />}
+                  </>
                 )
               }
             })}

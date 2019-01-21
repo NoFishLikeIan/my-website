@@ -75,58 +75,7 @@ class GeneticAlgorithm {
     this.gpu = new GPU()
     this.mutate = this.gpu.createKernel(
       function(instanceArray, nInstanceTimesFeautureRandomNumbers, maxX, maxY, allPixels) {
-        var instance = instanceArray[this.thread.x]
-        var _random = nInstanceTimesFeautureRandomNumbers[this.thread.x]
-        var radius = instanceArray[instanceArray.length - 1]
-
-        var r = instance[0]
-        var g = instance[1]
-        var b = instance[2]
-        var a = instance[3]
-        var x = instance[4]
-        var y = instance[5]
-
-        var newR = Math.max(Math.min(r + _random[0] * 255, 255), 0)
-        var newG = Math.max(Math.min(g + _random[1] * 255, 255), 0)
-        var newB = Math.max(Math.min(b + _random[2] * 255, 255), 0)
-        var newA = Math.max(Math.min(a + _random[3] * 255, 255), 0)
-
-        var newX = Math.max(Math.min(x + _random[4] * radius, maxX), 0)
-        var newY = Math.max(Math.min(y + _random[5] * radius, maxY), 0)
-
-        var newRadius = Math.max(Math.min(radius + _random[6] * radius, 5), 1)
-
-        // Find points under the new circle
-        var relevantPixels = []
-        var extentX = [Math.floor(newX - newRadius), Math.floor(newX + radius)]
-        var extentY = [Math.floor(newY - newRadius), Math.floor(newY + radius)]
-
-        var deltaX = Math.abs(extentX[1] - extentX[0])
-        var deltaY = Math.abs(extentY[1] - extentY[0])
-
-        for (var w = 0; w < deltaX; w++) {
-          for (var z = 0; z < deltaY; z++) {
-            var rgbaOfThisPixel = allPixels[w + z * maxX]
-            relevantPixels.push(rgbaOfThisPixel)
-          }
-        }
-
-        var N = relevantPixels.length
-        var sumSquared = 0
-
-        for (var i = 0; i < n; i++) {
-          var rgbaTarget = relevantPixels[i]
-          var squaredErrorR = (rgbaTarget[0] - newR) * (rgbaTarget[0] - newR)
-          var squaredErrorG = (rgbaTarget[1] - newG) * (rgbaTarget[1] - newG)
-          var squaredErrorB = (rgbaTarget[2] - newB) * (rgbaTarget[2] - newB)
-          var squaredErrorA = (rgbaTarget[3] - newA) * (rgbaTarget[3] - newA)
-          var thisPixelSumSquare = squaredErrorR + squaredErrorG + squaredErrorB + squaredErrorA
-
-          sumSquared = thisPixelSumSquare + sumSquared
-        }
-
-        var fitness = sumSquared / N
-        return [fitness, r, g, b, a, x, y, radius]
+        return [0.0, 0.0, 0.0]
       },
       {
         output: [n],

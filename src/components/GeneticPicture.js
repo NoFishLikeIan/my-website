@@ -2,7 +2,7 @@
 
 import React from 'react'
 import getPixels from 'get-pixels'
-import { range, clamp } from 'lodash'
+import { range, clamp, flatten } from 'lodash'
 import GPU from 'gpu.js'
 import { Circle, Stage, Layer } from 'react-konva'
 
@@ -75,18 +75,67 @@ class GeneticAlgorithm {
     this.gpu = new GPU()
     this.mutate = this.gpu.createKernel(
       function(instanceArray, nInstanceTimesFeautureRandomNumbers, maxX, maxY, allPixels) {
-        return [0.0, 0.0, 0.0]
+        const thread = this.thread.x * 7
+        const r = instanceArray[thread]
+        const g = instanceArray[thread + 1]
+        const b = instanceArray[thread + 2]
+        const a = instanceArray[thread + 3]
+        const x = instanceArray[thread + 4]
+        const y = instanceArray[thread + 5]
+        const radius = instanceArray[thread + 6]
+
+        const random0 = nInstanceTimesFeautureRandomNumbers[thread]
+        const random1 = nInstanceTimesFeautureRandomNumbers[thread + 1]
+        const random2 = nInstanceTimesFeautureRandomNumbers[thread + 2]
+        const random3 = nInstanceTimesFeautureRandomNumbers[thread + 3]
+        const random4 = nInstanceTimesFeautureRandomNumbers[thread + 4]
+        const random5 = nInstanceTimesFeautureRandomNumbers[thread + 5]
+        const random6 = nInstanceTimesFeautureRandomNumbers[thread + 6]
+
+        const newR = Math.floor(Math.max(Math.min(r + random0 * 255, 255), 0))
+        const newG = Math.floor(Math.max(Math.min(g + random1 * 255, 255), 0))
+        const newB = Math.floor(Math.max(Math.min(b + random2 * 255, 255), 0))
+        const newA = Math.floor(Math.max(Math.min(a + random3 * 255, 255), 0))
+        const newX = Math.floor(Math.max(Math.min(x + random4 * radius, maxX), 0))
+        const newY = Math.floor(Math.max(Math.min(y + random5 * radius, maxY), 0))
+        const newRadius = Math.floor(Math.max(Math.min(radius + random6 * radius, 5), 1))
+
+        const extentX = [Math.floor(newX - newRadius), Math.floor(newX + radius)]
+        const extentY = [Math.floor(newY - newRadius), Math.floor(newY + radius)]
+        const baseX = extentX[0]
+        const baseY = extentY[0]
+
+        const deltaX = Math.abs(extentX[1] - extentX[0])
+        const deltaY = Math.abs(extentY[1] - extentY[0])
+
+        let sumSquare = 0
+        const numberOfPixels = deltaX + deltaY
+
+        for (let i = 0; i < numberOfPixels; i++) {
+          const currentPixelIndex = (baseX + maxX * (baseY + Math.floor(i / deltaX)) + i) * 4
+          const rCurrent = allPixels[currentPixelIndex]
+          const gCurrent = allPixels[currentPixelIndex + 1]
+          const bCurrent = allPixels[currentPixelIndex + 2]
+          const aCurrent = allPixels[currentPixelIndex + 3]
+
+          const squaredErrorR = (newR - rCurrent) * (newR - rCurrent)
+          const squaredErrorG = (newG - gCurrent) * (newG - gCurrent)
+          const squaredErrorB = (newB - bCurrent) * (newB - bCurrent)
+          const squaredErrorA = (newA - aCurrent) * (newA - aCurrent)
+
+          sumSquare = sumSquare + squaredErrorR + squaredErrorG + squaredErrorB + squaredErrorA
+        }
+
+        const fitness = Math.floor(sumSquare / numberOfPixels)
+        const binaryEncoded = newR + newG * 256 + newB * 256 * 256 * newA * 256 * 256 * 256
+        const location = newX + newY * maxX
+
+        return 1
+
+        // return [fitness, binaryEncoded, location, newRadius]
       },
       {
         output: [n],
-        paramTypes: {
-          instanceArray: 'Array(2)',
-          nInstanceTimesFeautureRandomNumbers: 'Array',
-          maxX: 'Number',
-          maxY: 'Number',
-          allPixels: 'Array(2)',
-        },
-        returnType: 'Array',
       },
     )
   }
@@ -103,17 +152,18 @@ class GeneticAlgorithm {
     const nInstanceTimesFeautureRandomNumbers = range(this.offSpring.length).map(random)
     const maxX = this.width
     const maxY = this.height
-    const allPixels = this.actuallyEveryPixel
+    const allPixels = flatten(this.actuallyEveryPixel)
 
     const allNewData = this.mutate(
-      instanceArray,
+      flatten(instanceArray),
       nInstanceTimesFeautureRandomNumbers,
       maxX,
       maxY,
       allPixels,
     )
+    console.log({ allNewData })
 
-    this.offSpring.forEach((instance, index) => instance.modify(...allNewData[index]))
+    // this.offSpring.forEach((instance, index) => instance.modify(...allNewData[index]))
   }
 }
 

@@ -1,5 +1,7 @@
 import React from 'react'
 import { Select } from '@accurat/react-components'
+import { noop } from 'lodash'
+
 import { MiceProblem } from './MiceProblem'
 import { BoidsChase } from './BoidsChase'
 import { MiceWithBoids } from './MiceWithBoids'
@@ -7,6 +9,7 @@ import { Bio } from './Bio'
 import { fibonacciGenerator } from '../lib/utils'
 
 const possibleSelections = ['Boids Chase', 'Mice Problem', 'Mice Boids', 'Deselected']
+const nonUsableSelections = ['Mice Problem']
 
 const selectViz = {
   'Boids Chase': BoidsChase,
@@ -106,12 +109,19 @@ export default class App extends React.Component {
             />
             <div className="w-50 bl b--darkgray pa2">
               <Select className="bn select" label={selectedViz}>
-                {possibleSelections.map((s, i) => (
-                  <div key={i} className="options" onClick={this.changeSelection(s)}>
-                    {' '}
-                    {s}{' '}
-                  </div>
-                ))}
+                {possibleSelections.map((s, i) => {
+                  const disabled = nonUsableSelections.includes(s)
+                  return (
+                    <div
+                      key={i}
+                      className={`options ${disabled ? 'options-disabled' : ''}`}
+                      onClick={!disabled ? this.changeSelection(s) : noop}
+                    >
+                      {' '}
+                      {s}{' '}
+                    </div>
+                  )
+                })}
               </Select>
               <Corpus
                 name={selectedViz}
@@ -121,7 +131,6 @@ export default class App extends React.Component {
             </div>
           </div>
         </div>
-        {/* <div className="section">Viz</div> */}
       </div>
     )
   }

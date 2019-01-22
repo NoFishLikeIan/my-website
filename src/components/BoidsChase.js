@@ -4,14 +4,16 @@ import { range, mean, sortBy, clamp } from 'lodash'
 import { Circle, Stage, Layer } from 'react-konva'
 
 import { Ripple } from './Ripple'
+import { RunnerHistory } from './RunnerHistory'
 import { calculateMagnitude, vectorSubtract } from '../lib/boidsUtils'
+import { colors, RADIUS } from '../lib/constants'
 
 const WINDOW_F = 0.4
-const RADIUS = 5
 const MAX_FORCE = 2
 const MAX_SPEED = 1
 const ARREST_DISTANCE = 0.05
 const IM_WALL = 5
+const RUNNER_HISTORY_MAX = 40
 
 const pctOfSpped = (l = 0.1, u = 0.2) => Math.random() * (u - l + 1) + l
 const indexOfMaxValue = a => a.reduce((iMax, x, i, arr) => (x > arr[iMax] ? i : iMax), 0)
@@ -76,6 +78,10 @@ export class Vehicle {
 
     this.initTarget = new PVector(Math.random() * 100, Math.random() * 100)
 
+    this.firstRender = true
+  }
+
+  deactivateFirstRender() {
     this.firstRender = false
   }
 
@@ -215,6 +221,7 @@ export class BoidsChase extends React.Component {
     seekers: [],
     mousePosition: [50, 50],
     interval: 0,
+    runnerHistory: [],
   }
 
   interval = 0
@@ -260,7 +267,7 @@ export class BoidsChase extends React.Component {
   }
 
   updateFrame = () => {
-    const { runner, seekers, frame } = this.state
+    const { runner, seekers, frame, runnerHistory } = this.state
     seekers.forEach(s => {
       s.seek(runner.location)
       s.update()
@@ -268,7 +275,15 @@ export class BoidsChase extends React.Component {
 
     runner.randomSeek(seekers)
     runner.update()
-    this.setState({ frame: frame + 1 })
+    const newPoints = [runner.location.x, runner.location.y]
+    const currentHistoryLen = runnerHistory.length
+    const newHistory =
+      currentHistoryLen > RUNNER_HISTORY_MAX
+        ? runnerHistory.slice()
+        : runnerHistory.slice(currentHistoryLen - RUNNER_HISTORY_MAX + 1, currentHistoryLen)
+
+    newHistory.push(newPoints)
+    this.setState({ frame: frame + 1, runnerHistory: newHistory })
   }
 
   componentWillUnmount() {
@@ -278,10 +293,12 @@ export class BoidsChase extends React.Component {
   }
 
   render() {
-    const { width: side, runner, seekers } = this.state
+    const { width: side, runner, seekers, runnerHistory } = this.state
     const scale = scaleLinear()
       .domain([0, 100])
       .range([0, side])
+
+    const runnerHistoryScaled = runnerHistory.map(coords => coords.map(scale))
 
     return (
       runner &&
@@ -298,9 +315,10 @@ export class BoidsChase extends React.Component {
               x={scale(runner.location.x) || 0}
               y={scale(runner.location.y) || 0}
               radius={RADIUS}
-              fill={'red'}
+              fill={colors.red}
               opacity={0.8}
             />
+            <RunnerHistory runnerHistory={runnerHistoryScaled} />
             {seekers.map((s, i) => {
               const x = scale(s.location.x)
               const y = scale(s.location.y)
@@ -308,14 +326,14 @@ export class BoidsChase extends React.Component {
                 return (
                   <>
                     <Circle
-                      key={i}
                       x={x}
                       y={y}
                       radius={RADIUS}
-                      fill={'blue'}
+                      fill={colors.blue}
                       opacity={x && y ? 0.8 : 0}
+                      key={`${i}_circle`}
                     />
-                    {s.firstRender && <Ripple x={x} y={y} />}
+                    {s.firstRender && <Ripple x={x} y={y} fatherContext={s} key={`${i}_ripple`} />}
                   </>
                 )
               }

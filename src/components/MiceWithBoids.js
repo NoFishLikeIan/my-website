@@ -4,6 +4,7 @@ import { range } from 'lodash'
 import { Circle, Stage, Layer } from 'react-konva'
 
 import { Vehicle } from './BoidsChase'
+import { colors } from '../lib/constants'
 
 const WINDOW_F = 0.4
 const RADIUS = 5
@@ -90,7 +91,7 @@ export class MiceWithBoids extends React.Component {
                     x={x}
                     y={y}
                     radius={RADIUS}
-                    fill={'blue'}
+                    fill={colors.blue}
                     opacity={x && y ? opacity : 0}
                   />
                 )

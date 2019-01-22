@@ -1,10 +1,10 @@
 import React from 'react'
 import { Select } from '@accurat/react-components'
-import { range } from 'lodash'
 import { MiceProblem } from './MiceProblem'
 import { BoidsChase } from './BoidsChase'
 import { MiceWithBoids } from './MiceWithBoids'
 import { Bio } from './Bio'
+import { fibonacciGenerator } from '../lib/utils'
 
 const possibleSelections = ['Boids Chase', 'Mice Problem', 'Mice Boids', 'Deselected']
 
@@ -59,8 +59,8 @@ const Corpus = ({ name, miceFn, miceValue }) => {
             .
           </div>
           <div className="mv3 flex-row flex w-100">
-            <Select className="w3 mh2" scrollable label={miceValue}>
-              {range(2, 1000).map((n, i) => {
+            <Select className="w4 mh2" scrollable label={miceValue}>
+              {[...fibonacciGenerator(17)].map((n, i) => {
                 return (
                   <div key={i} className="miceselect" onClick={miceFn(n)}>
                     {n}

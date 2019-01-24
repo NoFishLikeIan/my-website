@@ -1,9 +1,10 @@
 import React from 'react'
+import { PictureInterpolation } from './PictureInterpolation'
 
 export class Bio extends React.Component {
   render() {
     return (
-      <div className="section">
+      <div className="section flex flex-row">
         <div className="w-50 h-100 relative">
           <div className="mv2 mh2">
             A self-deprecating website for a guy interested in Mathematics, Economics and
@@ -35,7 +36,10 @@ export class Bio extends React.Component {
           </div>
           <div className="mv5 mh2">
             Below you can find, first some of my exploration with algorithms and programming in
-            general, and then some blogpost, reflection, reading-list and whatnot.
+            general, and then some blogpost, reflection, reading-list and whatnot. <br />
+            On the right a couple of experiments with canvas rendering and interpolation between bw
+            pictures, first with linear 2d interpolation, then with quaternions. Still a work in
+            progress.
           </div>
           <div className="mh2 absolute bottom-0 pa2 bg bg-white bt b--light-gray">
             If you need more info email me, andrea.titton@accurat.it and have a look at my{' '}
@@ -47,6 +51,7 @@ export class Bio extends React.Component {
             because I cannot be bothered.
           </div>
         </div>
+        <PictureInterpolation className="w-50 h-100 relative" />
       </div>
     )
   }

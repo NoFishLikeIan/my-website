@@ -15,3 +15,5 @@ dist/
 
 # npm and yarn log
 *.log
+
+public/bw_bust.png

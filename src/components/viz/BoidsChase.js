@@ -5,8 +5,8 @@ import { Circle, Stage, Layer } from 'react-konva'
 
 import { Ripple } from './Ripple'
 import { RunnerHistory } from './RunnerHistory'
-import { calculateMagnitude, vectorSubtract } from '../lib/boidsUtils'
-import { colors, RADIUS } from '../lib/constants'
+import { calculateMagnitude, vectorSubtract } from '../../lib/boidsUtils'
+import { colors, RADIUS } from '../../lib/constants'
 
 const WINDOW_F = 0.4
 const MAX_FORCE = 2
@@ -288,7 +288,6 @@ export class BoidsChase extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.recomputeWindow)
-    this.updateFrame()
     clearInterval(this.interval)
   }
 

@@ -109,7 +109,7 @@ export class PictureInterpolation extends React.Component {
   }
 
   componentWillUnmount() {
-    this.animationId = clearInterval(this.updatePicture, 16)
+    clearInterval(this.animationId)
   }
 
   canvasRef = canvas => (this.canvas = this.canvas || canvas)

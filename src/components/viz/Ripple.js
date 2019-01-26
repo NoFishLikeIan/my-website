@@ -1,7 +1,7 @@
 import React from 'react'
 import { Circle } from 'react-konva'
 
-import { colors } from '../lib/constants'
+import { colors } from '../../lib/constants'
 
 const RIPPLE_ITERATIONS = 100
 const RADIUS_RANGE = [5, 50]

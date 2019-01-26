@@ -1,6 +1,6 @@
 import React from 'react'
 import { Circle } from 'react-konva'
-import { colors, RADIUS } from '../lib/constants'
+import { colors, RADIUS } from '../../lib/constants'
 
 const opacityFactory = (totalLen, opacityRange = [0.2, 0.5]) => index => {
   const [max, min] = opacityRange

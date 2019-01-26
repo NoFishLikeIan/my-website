@@ -4,7 +4,7 @@ import { range } from 'lodash'
 import { Circle, Stage, Layer } from 'react-konva'
 
 import { Vehicle } from './BoidsChase'
-import { colors } from '../lib/constants'
+import { colors } from '../../lib/constants'
 
 const WINDOW_F = 0.4
 const RADIUS = 5

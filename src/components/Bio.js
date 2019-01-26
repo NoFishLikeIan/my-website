@@ -5,8 +5,6 @@ import { PictureInterpolation } from './PictureInterpolation'
 @withRouter
 export class Bio extends React.Component {
   render() {
-    const { pathname } = this.props.location
-
     return (
       <div className="section flex flex-row">
         <div className="w-50 h-100 relative">
@@ -54,12 +52,12 @@ export class Bio extends React.Component {
             Just as a disclaimer, this website will be desktop only and a constant work in progress
             because I cannot be bothered.
           </div>
-          <div className="w-100">
-            Route around the website, <Link to="/algoplayground">the algo playground</Link>,
-            coming_soon
+          <div className="mh2 mv5 w-100">
+            Route around the website, <Link to="/algoplayground">the algo playground</Link>, the
+            rest is coming_soon
           </div>
         </div>
-        {pathname === '/' && <PictureInterpolation className="w-50 h-100 relative" />}
+        {<PictureInterpolation className="w-50 h-100 relative tc ma3 pa3" />}
       </div>
     )
   }

@@ -116,9 +116,16 @@ export class PictureInterpolation extends React.Component {
 
   render() {
     const { className = '' } = this.props
+    const { imagePixels } = this.state
+    const fetchedAll = imagePixels.length === IMAGES.length
+
     return (
       <div className={`mh2 ${className}`}>
-        <canvas ref={this.canvas} width={700} height={700} />
+        {fetchedAll ? (
+          <canvas ref={this.canvas} width={700} height={700} />
+        ) : (
+          'inefficiently loading again, read left in the meantime...'
+        )}
       </div>
     )
   }

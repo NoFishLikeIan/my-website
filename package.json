@@ -39,6 +39,8 @@
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-konva": "^16.7.1",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
     "tachyons-extra": "^1.1.2"
   }
 }

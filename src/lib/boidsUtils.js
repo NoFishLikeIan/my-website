@@ -1,4 +1,4 @@
-import { PVector } from '../components/BoidsChase'
+import { PVector } from '../components/viz/BoidsChase'
 
 export function calculateMagnitude(vector) {
   return Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2))

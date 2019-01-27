@@ -89,3 +89,34 @@ iframe {
   cursor: pointer;
   background-color: gray;
 }
+
+.dataframe {
+  width: 80%;
+}
+
+.dataframe tbody tr th:only-of-type {
+  vertical-align: middle;
+}
+
+.dataframe tbody tr th {
+  vertical-align: top;
+}
+
+.dataframe thead th {
+  text-align: right;
+}
+
+.codesnippet {
+  background-color: #ccc;
+  padding: 0.5rem;
+  width: 90%;
+}
+
+.post {
+  /* display: flex;
+  flex-direction: column; */
+  width: 100%;
+  height: 800px;
+  justify-content: center;
+  overflow-y: auto;
+}

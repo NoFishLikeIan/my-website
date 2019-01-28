@@ -7,6 +7,7 @@ export class BlogContainer extends React.Component {
   render() {
     return (
       <div className="section">
+        <BlogHeader />
         <Post />
       </div>
     )

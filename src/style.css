@@ -120,3 +120,35 @@ iframe {
   justify-content: center;
   overflow-y: auto;
 }
+
+.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+}
+
+.panel {
+  max-height: 0;
+  overflow: hidden;
+  height: auto;
+  transition: max-height 0.5s ease-out;
+}
+
+.panel.open {
+  max-height: 700px;
+  overflow: auto;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-color: #444;
+}
+
+.active,
+.accordion:hover {
+  background-color: slategray;
+}

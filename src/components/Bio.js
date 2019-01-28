@@ -53,8 +53,8 @@ export class Bio extends React.Component {
             because I cannot be bothered.
           </div>
           <div className="mh2 mv5 w-100">
-            Route around the website, <Link to="/algoplayground">the algo playground</Link>, the
-            rest is coming_soon
+            Route around the website, <Link to="/algoplayground">the algo playground</Link>, the{' '}
+            <Link to="/blog">blog posts</Link> and more coming_soon_tm.
           </div>
         </div>
         {<PictureInterpolation className="w-50 h-100 relative tc ma3 pa3" />}

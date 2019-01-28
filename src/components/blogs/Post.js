@@ -1,9 +1,10 @@
 import React from 'react'
+import { round } from 'lodash'
 import { DataTable } from './AckerasTable'
 
-const AckerasIntro = () => {
+const AckerasIntro = ({ className = '' }) => {
   return (
-    <div className="post">
+    <div className={`post ${className}`}>
       <div className="w-90 pa2 mt4 mv2">
         This code refers to a{' '}
         <a href="https://github.com/accurat/ackeras" target="_blank" rel="noopener noreferrer">
@@ -144,7 +145,7 @@ const AckerasIntro = () => {
         </code>
       </pre>
       <div className="w-90 pa2 mv2">
-        Last but not least we can do with some outlier detection. I am a bit bothered of writing but
+        Last but not least we can do with some outlier detection. I am a bit bored of writing but
         look at this sexy plot.
       </div>
       <div className="w-90 pa2 mv2">
@@ -154,8 +155,56 @@ const AckerasIntro = () => {
   )
 }
 
-export class Post extends React.Component {
+class AccordionButton extends React.Component {
+  animationId = 0
+
+  state = { timeAgo: '' }
+
+  recomputeCurrentDate = () => {
+    const { unixTimePosted } = this.props
+    const currentTime = Date.now() - unixTimePosted
+    const days = round(currentTime / 8.64e7, 6)
+    this.setState({ timeAgo: days })
+  }
+
+  componentDidMount() {
+    this.animationId = setInterval(this.recomputeCurrentDate, 16)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.animationId)
+  }
+
   render() {
-    return <AckerasIntro />
+    const { className = '', openAccordion, postName = '' } = this.props
+    const { timeAgo } = this.state
+    return (
+      <div className={`flex flex-row justify-between ${className}`} onClick={openAccordion}>
+        <div className="mh2">{postName}</div>
+        <div className="mh2">{`Posted ${timeAgo} days ago`}</div>
+      </div>
+    )
+  }
+}
+
+export class Post extends React.Component {
+  state = { opened: false }
+
+  openPanel = () => {
+    this.setState({ opened: !this.state.opened })
+  }
+
+  render() {
+    return (
+      <>
+        <AccordionButton
+          className="accordion"
+          openAccordion={this.openPanel}
+          unixTimePosted={1548701259370}
+          postName="Ackeras basic intro"
+        />
+        <AckerasIntro className={`panel ${this.state.opened ? 'open' : ''}`} />
+      </>
+    )
   }
 }

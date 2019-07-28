@@ -22,16 +22,20 @@ export class Bio extends React.Component {
             , but careful it is a evil PDF format.
           </div>
           <div className="mv2 mh2">
-            Currently working as a Data Scientist at{' '}
+            Worked as a Data Scientist/Engineer at{' '}
             <a href="https://www.accurat.it/" target="_blank" rel="noopener noreferrer">
               {' '}
               Accurat
             </a>
             , contributor to the{' '}
             <a href="https://github.com/accurat/" target="_blank" rel="noopener noreferrer">
-              @accurat/react-components and ackeras
+              data-juggler and ackeras
             </a>{' '}
             libraries.
+          </div>
+          <div className="mv2 mh2">
+            Currently starting a MPhil. at <a href="https://www.tinbergen.nl/home">Tinbergen</a> in
+            economics but open to some free lance work!
           </div>
           <div className="mv2 mh2">
             Programming mostly in Python, R and Typescript. Interested in Clojure, Julia and Lua.
@@ -44,7 +48,8 @@ export class Bio extends React.Component {
             progress.
           </div>
           <div className="mh2 absolute bottom-0 pa2 bg bg-white bt b--light-gray">
-            If you need more info email me, andrea.titton@accurat.it and have a look at my{' '}
+            If you need more info email me, andreatitton96@gmail.com, check{' '}
+            <a href="https://github.com/nofishLikeIan">my github account</a> or have a look at my{' '}
             <a href="/cv.pdf" target="_blank" rel="noopener noreferrer">
               CV
             </a>
@@ -54,7 +59,9 @@ export class Bio extends React.Component {
           </div>
           <div className="mh2 mv5 w-100">
             Route around the website, <Link to="/algoplayground">the algo playground</Link>, the{' '}
-            <Link to="/blog">blog posts</Link> and more coming_soon_tm.
+            <Link to="/blog">blog posts</Link>, an explirabke{' '}
+            <a href="https://mandelbrot-gen-ian.netlify.com/">Mandelbrot set implementation</a> with
+            generators, and more coming_soon_tm.
           </div>
         </div>
         {<PictureInterpolation className="w-50 h-100 relative tc ma3 pa3" />}

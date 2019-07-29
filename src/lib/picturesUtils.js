@@ -1,5 +1,4 @@
 import { range, mean, orderBy } from 'lodash'
-import { number } from 'prop-types'
 
 export function getAllPixels(pixels) {
   const [width, height, n] = pixels.shape

@@ -124,7 +124,7 @@ export class PictureInterpolation extends React.Component {
         {fetchedAll ? (
           <canvas ref={this.canvas} width={700} height={700} />
         ) : (
-          'inefficiently loading again, read left in the meantime...'
+          'just pretend this is a loader...'
         )}
       </div>
     )
